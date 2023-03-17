@@ -2,7 +2,8 @@ using System;
 using Chess.Core;
 using CookComputing.XmlRpc;
 using XMLRPC;
-using System.Reflection.Emit;
+using MessageMaker;
+using System.Text;
 
 public static class ChessOverRF
 {
@@ -12,7 +13,9 @@ public static class ChessOverRF
         
         IFldigiRPC proxy = (IFldigiRPC)XmlRpcProxyGen.Create(typeof(IFldigiRPC));
 
-        SendMessage("a", proxy);
+        Message message = new Message("init", "NO6H", "1234");
+
+        byte[] output = message.toBytes();
 
     }
 
@@ -30,4 +33,14 @@ public static class ChessOverRF
         }
     }
 
+    public static void PrintByteArray(byte[] bytes)
+    {
+        var sb = new StringBuilder("new byte[] { ");
+        foreach (var b in bytes)
+        {
+            sb.Append(b + ", ");
+        }
+        sb.Append("}");
+        Console.WriteLine(sb.ToString());
+    }
 }

@@ -10,4 +10,7 @@
       <HintPath>CookComputing.XmlRPCv3.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="STH1123.ReedSolomon" Version="2.1.0"/>
+  </ItemGroup>
 </Project>
