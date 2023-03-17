@@ -1,0 +1,17 @@
+C:\Users\Gio\Desktop\ChessOverRF\bin\Debug\net7.0\ChessOverRF.exe
+C:\Users\Gio\Desktop\ChessOverRF\bin\Debug\net7.0\ChessOverRF.deps.json
+C:\Users\Gio\Desktop\ChessOverRF\bin\Debug\net7.0\ChessOverRF.runtimeconfig.json
+C:\Users\Gio\Desktop\ChessOverRF\bin\Debug\net7.0\ChessOverRF.dll
+C:\Users\Gio\Desktop\ChessOverRF\bin\Debug\net7.0\ChessOverRF.pdb
+C:\Users\Gio\Desktop\ChessOverRF\bin\Debug\net7.0\CookComputing.XmlRpcV2.dll
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.csproj.AssemblyReference.cache
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.AssemblyInfoInputs.cache
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.AssemblyInfo.cs
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.csproj.CoreCompileInputs.cache
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.csproj.CopyComplete
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.dll
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\refint\ChessOverRF.dll
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.pdb
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ChessOverRF.genruntimeconfig.cache
+C:\Users\Gio\Desktop\ChessOverRF\obj\Debug\net7.0\ref\ChessOverRF.dll
