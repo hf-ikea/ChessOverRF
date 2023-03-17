@@ -17,6 +17,10 @@ public static class ChessOverRF
 
         byte[] output = message.toBytes();
 
+        Console.WriteLine(string.Join(", ", output));
+
+        Console.WriteLine(string.Join(", ", ReedSolomon.Decode(output.ToList())));
+
     }
 
     public static void SendMessage(string message, IFldigiRPC proxy)
@@ -33,14 +37,4 @@ public static class ChessOverRF
         }
     }
 
-    public static void PrintByteArray(byte[] bytes)
-    {
-        var sb = new StringBuilder("new byte[] { ");
-        foreach (var b in bytes)
-        {
-            sb.Append(b + ", ");
-        }
-        sb.Append("}");
-        Console.WriteLine(sb.ToString());
-    }
 }

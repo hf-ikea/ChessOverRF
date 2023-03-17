@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using MessageMaker;
 
 namespace MessageMaker {
     public class Message
@@ -53,7 +54,7 @@ namespace MessageMaker {
             byteArray.Add(0x99);
             byteArray.Add(0xFF);
 
-            return byteArray.ToArray();
+            return ReedSolomon.Encode(byteArray);
         }
     }
 }
