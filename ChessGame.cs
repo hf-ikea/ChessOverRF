@@ -17,7 +17,7 @@ namespace Chess.Core
             _nextPlayerColor = PieceColor.White;
         }
 
-        public string Move(char fromColumn, int fromRow, char toColumn, int toRow)
+        public MovementResult Move(char fromColumn, int fromRow, char toColumn, int toRow)
         {
             var result = ChessBoard.MovePiece(fromColumn, fromRow, toColumn, toRow, _nextPlayerColor);
 
@@ -26,7 +26,7 @@ namespace Chess.Core
                 _nextPlayerColor = (_nextPlayerColor == PieceColor.White ? PieceColor.Black : PieceColor.White);
             }
 
-            return result.Description;
+            return result;
         }
 
         public string ShowNextPlayer()
