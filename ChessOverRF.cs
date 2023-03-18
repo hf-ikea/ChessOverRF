@@ -13,8 +13,6 @@ public static class ChessOverRF
 {
     static int pos;
 
-    static string? messages;
-
     static Message? currentMsg;
 
     static Regex? hexRx;
@@ -36,7 +34,7 @@ public static class ChessOverRF
         string host = Console.ReadLine().ToLower();
 
         pos = 0;
-        messages = "";
+        transmitting = false;
         hexRx = new Regex(@"[a-f0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         msgSearcher = new Regex(@"(ff99fa)([a-f0-9][a-f0-9])+(fa99ff)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -80,19 +78,10 @@ public static class ChessOverRF
 
     public static void RunLoops(IFldigiRPC proxy)
     {
-        //CheckRXState(proxy);
+        CheckRXState(proxy);
+        Thread.Sleep(10);
         MessageSearcher(proxy);
-    }
-
-    public static string AddToRxBufferLoop(IFldigiRPC proxy)
-    {
-        string msgList = "";
-        int newPos = proxy.GetRXLength() - pos;
-        msgList += proxy.GetRXWidget(pos, newPos).ToString();
-        msgList = ConvertHex(msgList);
-        
-        pos += newPos;
-        return msgList;
+        Thread.Sleep(10);
     }
 
     public static void MessageSearcher(IFldigiRPC proxy)
@@ -142,7 +131,7 @@ public static class ChessOverRF
     {
         proxy.AddText(message + "^r");
 
-        if (proxy.GetTRState() == "RX")
+        if (!transmitting)
         {
             proxy.StartTx();
         }
