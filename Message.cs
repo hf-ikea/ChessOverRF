@@ -29,12 +29,12 @@ namespace MessageMaker
             typeDict = new Dictionary<string, byte>();
             typeDict.Add("init", 0x11);
             typeDict.Add("join", 0x22);
-            typeDict.Add("startGame", 0x33);
+            typeDict.Add("turn", 0x33);
 
             lookUp = new Dictionary<byte, string>();
             lookUp.Add(0x11, "init");
             lookUp.Add(0x22, "join");
-            lookUp.Add(0x33, "startGame");
+            lookUp.Add(0x33, "turn");
 
             callEnd = 0xAF;
             payloadEnd = 0xAE;
@@ -56,7 +56,7 @@ namespace MessageMaker
             if (this.type == "init" || this.type == "join" || this.type == "ack") this.payload = null;
             else
             {
-                this.payload = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, callEndByte, Array.IndexOf(decodedBytes, payloadEnd) - callEndByte).ToArray());
+                this.payload = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, callEndByte + 1, Array.IndexOf(decodedBytes, payloadEnd) - callEndByte - 1).ToArray());
             }
 
             return this;

@@ -14,12 +14,12 @@ using System.Text.Json;
 
 public static class ChessOverRF
 {
-    static int pos;
-
     static Message? currentMsg;
 
     static Regex? hexRx;
     static Regex? msgSearcher;
+
+    static string? newlineChar;
 
     static bool transmitting;
 
@@ -27,22 +27,29 @@ public static class ChessOverRF
 
     static Player? opponent;
     static ChessGame? game;
+    static bool gameStarted;
 
     public static void Main(string[] args)
     {
         IFldigiRPC proxy = (IFldigiRPC)XmlRpcProxyGen.Create(typeof(IFldigiRPC));
-        //proxy.ClearRX();
+        proxy.ClearRX();
+
+        transmitting = false;
+        gameStarted = false;
+        byte[] newlineByte = new byte[1];
+        newlineByte[0] = 0x0A;
+        newlineChar = Encoding.UTF8.GetString(newlineByte);
+        hexRx = new Regex(@"[a-f0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        msgSearcher = new Regex(@"(ff99fa)([a-f0-9][a-f0-9])+(fa99ff)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        // Message tester = test(proxy, "FF99FA0033004E4F3648AF7B226663223A2245222C226672223A322C227463223A2245222C227472223A347DAEB221BE652F36D9700500FA99FF");
+        // Console.WriteLine("Callsign: " + tester.callsign + ", Type: " + tester.type + ", Payload: " + tester.payload);
 
         Console.Write("Enter your callsign: ");
         string? callsign = Console.ReadLine().ToUpper();
 
         Console.Write("Are you the host of the game? (y/n): ");
         string host = Console.ReadLine().ToLower();
-
-        pos = 0;
-        transmitting = false;
-        hexRx = new Regex(@"[a-f0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        msgSearcher = new Regex(@"(ff99fa)([a-f0-9][a-f0-9])+(fa99ff)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         if (host == "y")
         {
@@ -63,22 +70,29 @@ public static class ChessOverRF
                         opponent = new Player(currentMsg.callsign);
                         opponent.opponentTurn = false;
                         Console.WriteLine(opponent.callsign + " has joined your game.");
+                        gameStarted = true;
                         
                         game = new ChessGame();
                         game.ShowBoard(Console.OpenStandardOutput());
                         ChessMovement moveStruct = MakeMove(game);
 
-                        while(!moveStruct.result.IsSuccess)
+                        while(!moveStruct.rs.IsSuccess)
                         {
                             moveStruct = MakeMove(game);
-                            Console.WriteLine(moveStruct.result.Description);
+                            Console.WriteLine(moveStruct.rs.Description);
                         }
 
                         SendMessage(Convert.ToHexString(new Message("turn", callsign, JsonSerializer.Serialize(moveStruct)).toBytes()), proxy);
+                        Console.WriteLine(JsonSerializer.Serialize(moveStruct));
                         while(transmitting)
                         {
                             Thread.Sleep(10);
+                            CheckRXState(proxy);
                         }
+                    }
+                    else if(currentMsg.type == "turn" && gameStarted)
+                    {
+
                     }
                 }
             }
@@ -88,28 +102,38 @@ public static class ChessOverRF
             Console.Write("Press enter when you are ready to start rxing.");
             Console.ReadLine();
             // start recieve loop
+            //test(proxy, "FF99FA0033004E4F3648AF7B226663223A2245222C226672223A322C227463223A2245222C227472223A347DAEB221BE652F36D9700500FA99FF");
             while(true)
             {
                 RunLoops(proxy);
                 if(newMessage)
                 {
-                    if(currentMsg.callsign == callsign) continue;
+                    Console.WriteLine(currentMsg.type);
                     newMessage = false;
+                    if(currentMsg.callsign == callsign) continue;
 
-                    if(currentMsg.type == "init")
+                    if(currentMsg.type == "init" && !gameStarted)
                     {
                         Console.Write("New game from " + currentMsg.callsign + "!\nWould you like to join? (y/n): ");
                         if(Console.ReadLine().ToLower() == "y")
                         {
                             Console.WriteLine("Joining Game...");
                             SendMessage(Convert.ToHexString(new Message("join", callsign, "").toBytes()), proxy);
+                            while(transmitting)
+                            {
+                                Thread.Sleep(10);
+                                CheckRXState(proxy);
+                                Console.WriteLine(transmitting.ToString());
+                            }
                             opponent = new Player(currentMsg.callsign);
-                        }
-                        else continue;
+                            gameStarted = true;
+                            Console.WriteLine("done");
+                        } else continue;
                     }
-                    else if(currentMsg.type == "startGame")
+                    else if(currentMsg.type == "turn" && gameStarted)
                     {
-                        opponent.opponentTurn = true;
+                        opponent.opponentTurn = false;
+                        Console.WriteLine(currentMsg.payload);
                     }
                 }
             }
@@ -139,11 +163,11 @@ public static class ChessOverRF
         int toRow = Convert.ToInt32(source.Substring(1,1));
 
         ChessMovement returnVal = new ChessMovement();
-        returnVal.result = game.Move(fromColumn, fromRow, toColumn, toRow);
-        returnVal.fromColumn = fromColumn;
-        returnVal.fromRow = fromRow;
-        returnVal.toColumn = toColumn;
-        returnVal.toRow = toRow;
+        returnVal.rs = game.Move(fromColumn, fromRow, toColumn, toRow);
+        returnVal.fc = fromColumn;
+        returnVal.fr = fromRow;
+        returnVal.tc = toColumn;
+        returnVal.tr = toRow;
 
         return returnVal;
     }
@@ -165,19 +189,18 @@ public static class ChessOverRF
         MatchCollection matches = msgSearcher.Matches(msgList);
 
         if(matches.Count == 0) return;
-        Console.WriteLine(matches[0].Value);
         
         Message message = new Message("", "", "");
         message.fromBytes(StringToByteArray(matches[0].Value));
         currentMsg = message;
         newMessage = true;
         proxy.ClearRX();
-        
     }
 
     public static void CheckRXState(IFldigiRPC proxy)
     {
         if (proxy.GetTRState() == "RX") transmitting = false;
+        else transmitting = true;
     }
 
     public static string ConvertHex(string? str)
@@ -188,7 +211,7 @@ public static class ChessOverRF
         {
             if (!hexRx.IsMatch(c.ToString()))
             {
-                returnStr += "0";
+                if(!(c.ToString() == newlineChar)) returnStr += "0";
             }
             else
             {
@@ -201,6 +224,8 @@ public static class ChessOverRF
 
     public static void SendMessage(string message, IFldigiRPC proxy)
     {
+        CheckRXState(proxy);
+        Thread.Sleep(10);
         proxy.AddText(message + "^r");
 
         if (!transmitting)
@@ -222,10 +247,10 @@ public static class ChessOverRF
 
     public struct ChessMovement
     {
-        public MovementResult result;
-        public char fromColumn;
-        public int fromRow;
-        public char toColumn;
-        public int toRow;
+        public MovementResult rs;
+        public char fc { get; set; }
+        public int fr { get; set; }
+        public char tc { get; set; }
+        public int tr { get; set; }
     }
 }
