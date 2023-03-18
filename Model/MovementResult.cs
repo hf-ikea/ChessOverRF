@@ -1,4 +1,6 @@
-﻿using Chess.Core.Model;
+﻿#pragma warning disable CS8618
+
+using Chess.Core.Model;
 
 namespace Chess.Core.Model
 {

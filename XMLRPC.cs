@@ -17,5 +17,8 @@ namespace XMLRPC
 
         [XmlRpcMethod("modem.set_by_name")]
         String SetModem(string message);
+
+        [XmlRpcMethod("modem.get_names")]
+        String[] GetModems();
     }
 }

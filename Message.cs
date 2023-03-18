@@ -48,6 +48,16 @@ namespace MessageMaker {
                 byteArray.Add(byteInString);
             }
 
+            // check if payload isnt null and type isnt init
+            if(payload != "" && type != "init")
+            {
+                // add payload
+                foreach(byte byteInString in convertToUTF8(payload))
+                {
+                    byteArray.Add(byteInString);
+                }
+            }
+
             // add footer 
             byteArray.Add(0x00);
             byteArray.Add(0xFA);

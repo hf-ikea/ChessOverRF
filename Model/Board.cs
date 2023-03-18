@@ -1,4 +1,9 @@
-﻿using System;
+﻿#pragma warning disable CS8601
+#pragma warning disable CS8602
+#pragma warning disable CS8604
+#pragma warning disable CS8625
+
+using System;
 using System.Collections.Generic;
 
 namespace Chess.Core.Model
@@ -33,11 +38,11 @@ namespace Chess.Core.Model
         }
 
         public static Board NewEmpty() => new Board();
-        public Piece GetPiece(char column, int row) => _cases[row - 1, Columns[column] - 1] as Piece;
+        public Piece? GetPiece(char column, int row) => _cases[row - 1, Columns[column] - 1] as Piece;
 
         public T SetWhite<T>(char column, int row) where T : Piece
         {
-            T piece = Activator.CreateInstance(typeof(T), PieceColor.White) as T;
+            T? piece = Activator.CreateInstance(typeof(T), PieceColor.White) as T;
             _pieces.Add(piece);
 
             setPiece(piece, column, row);
@@ -47,7 +52,7 @@ namespace Chess.Core.Model
 
         public T SetBlack<T>(char column, int row) where T : Piece
         {
-            T piece = Activator.CreateInstance(typeof(T), PieceColor.Black) as T;
+            T? piece = Activator.CreateInstance(typeof(T), PieceColor.Black) as T;
             _pieces.Add(piece);
 
             setPiece(piece, column, row);

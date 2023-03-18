@@ -1,3 +1,5 @@
+#pragma warning disable CS8602
+
 using System;
 using Chess.Core;
 using CookComputing.XmlRpc;
@@ -13,13 +15,17 @@ public static class ChessOverRF
         
         IFldigiRPC proxy = (IFldigiRPC)XmlRpcProxyGen.Create(typeof(IFldigiRPC));
 
-        Message message = new Message("init", "NO6H", "1234");
+        
 
-        byte[] output = message.toBytes();
+        Console.Write("Enter your callsign: ");
+        string? callsign = Console.ReadLine().ToUpper();
 
-        Console.WriteLine(string.Join(", ", output));
+        Console.Write("Press enter when you would like to start the game.");
+        Console.ReadLine();
 
-        Console.WriteLine(string.Join(", ", ReedSolomon.Decode(output.ToList())));
+        byte[] message = new Message("init", callsign, "").toBytes();
+        proxy.SetModem("125OLIVIA-8");
+        SendMessage(Convert.ToHexString(message), proxy);
 
     }
 
