@@ -37,8 +37,8 @@ public static class ChessOverRF
 
         pos = 0;
         messages = "";
-        hexRx = new Regex(@"/[a-f0-9]/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        msgSearcher = new Regex(@"/(ff99fa)([a-f0-9][a-f0-9])+(fa99ff)/g", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        hexRx = new Regex(@"[a-f0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        msgSearcher = new Regex(@"(ff99fa)([a-f0-9][a-f0-9])+(fa99ff)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         if (host == "y")
         {
@@ -59,11 +59,19 @@ public static class ChessOverRF
                 RunLoops(proxy);
                 if(newMessage)
                 {
-                    //if(currentMsg.callsign == callsign) return;
+                    if(currentMsg.callsign == callsign) return;
+                    newMessage = false;
 
                     if(currentMsg.type == "init")
                     {
-                        Console.WriteLine("New game from " + currentMsg.callsign + "!");
+                        Console.Write("New game from " + currentMsg.callsign + "!\nWould you like to join? (y/n): ");
+                        if(Console.ReadLine().ToLower() == "y")
+                        {
+                            Console.WriteLine("Joining Game...");
+                            SendMessage(Convert.ToHexString(new Message("join", callsign, "").toBytes()), proxy);
+
+                        }
+                        else return;
                     }
                 }
             }
@@ -89,11 +97,10 @@ public static class ChessOverRF
 
     public static void MessageSearcher(IFldigiRPC proxy)
     {
-        Thread.Sleep(100);
+        Thread.Sleep(10);
         int curPos = proxy.GetRXLength();
-        Thread.Sleep(100);
-        string msgList = Encoding.UTF8.GetString(proxy.GetRXWidget(0, curPos));
-        Console.WriteLine(msgList);
+        Thread.Sleep(10);
+        string msgList = ConvertHex(Encoding.UTF8.GetString(proxy.GetRXWidget(0, curPos)));
         MatchCollection matches = msgSearcher.Matches(msgList);
 
         if(matches.Count == 0) return;
