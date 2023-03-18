@@ -15,10 +15,10 @@ namespace XMLRPC
         [XmlRpcMethod("main.get_trx_state")]
         String GetTRState();
 
-        [XmlRpcMethod("modem.set_by_name")]
-        String SetModem(string message);
+        [XmlRpcMethod("text.get_rx")]
+        String GetRXWidget(int start, int end);
 
-        [XmlRpcMethod("modem.get_names")]
-        String[] GetModems();
+        [XmlRpcMethod("text.get_rx_length")]
+        int GetRXLength();
     }
 }
