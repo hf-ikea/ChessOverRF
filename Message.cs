@@ -6,11 +6,16 @@ using MessageMaker;
 namespace MessageMaker {
     public class Message
     {
-        string type;
-        string callsign;
-        string payload;
+        public string type;
+        public string callsign;
+        public string? payload;
 
         Dictionary<string, byte> typeDict;
+
+        Dictionary<byte, string> lookUp;
+
+        byte callEnd;
+        byte payloadEnd;
         
         public Message(string type, string callsign, string payload)
         {
@@ -21,11 +26,35 @@ namespace MessageMaker {
             typeDict = new Dictionary<string, byte>();
             typeDict.Add("init", 0x11);
             typeDict.Add("join", 0x22);
+
+            lookUp = new Dictionary<byte, string>();
+            lookUp.Add(0x11, "init");
+            lookUp.Add(0x22, "join");
+
+            callEnd = 0xAF;
+            payloadEnd = 0xAE;
         }
 
         public byte[] convertToUTF8(string toUTF)
         {
             return Encoding.ASCII.GetBytes(toUTF);
+        }
+
+        public Message fromBytes(byte[] bytes)
+        {
+            byte[] decodedBytes = ReedSolomon.Decode(bytes.ToList<byte>());
+            int callEndByte = Array.IndexOf(decodedBytes, callEnd);
+
+            this.type = lookUp[decodedBytes[4]];
+            this.callsign = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, 6, callEndByte - 6).ToArray());
+            // decode payload if it exists
+            if (this.type == "init" || this.type == "join" || this.type == "closeEntry" || this.type == "ack") this.payload = null;
+            else
+            {
+                this.payload = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, callEndByte, Array.IndexOf(decodedBytes, payloadEnd) - callEndByte).ToArray());
+            }
+
+            return this;
         }
 
         public byte[] toBytes()
@@ -47,6 +76,7 @@ namespace MessageMaker {
             {
                 byteArray.Add(byteInString);
             }
+            byteArray.Add(callEnd);
 
             // check if payload isnt null and type isnt init
             if(payload != "" && type != "init")
@@ -57,14 +87,16 @@ namespace MessageMaker {
                     byteArray.Add(byteInString);
                 }
             }
+            byteArray.Add(payloadEnd);
 
-            // add footer 
-            byteArray.Add(0x00);
-            byteArray.Add(0xFA);
-            byteArray.Add(0x99);
-            byteArray.Add(0xFF);
+            List<byte> list = ReedSolomon.Encode(byteArray).ToList();
 
-            return ReedSolomon.Encode(byteArray);
+            list.Add(0x00);
+            list.Add(0xFA);
+            list.Add(0x99);
+            list.Add(0xFF);
+
+            return list.ToArray();
         }
     }
 }

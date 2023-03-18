@@ -38,6 +38,9 @@ public static class ChessOverRF
         {
             Console.WriteLine("Starting new game...\nTxing init message.");
             byte[] message = new Message("init", callsign, "").toBytes();
+            Console.WriteLine(string.Join(", ", message));
+            Message msg = new Message("", "", "").fromBytes(message);
+            Console.WriteLine("Callsign: " + msg.callsign + ", Type: " + msg.type + ", Payload: " + msg.payload);
             SendMessage(Convert.ToHexString(message), proxy);
         }
         else
@@ -59,7 +62,14 @@ public static class ChessOverRF
 
     public static void MessageSearcher(string messages)
     {
-        MatchCollection packets = msgSearcher.Matches(messages);
+        MatchCollection matches = msgSearcher.Matches(messages);
+        string packets = "";
+
+        foreach(Match match in matches)
+        {
+            packets += match.Value;
+        }
+        messages = messages.Substring(1);
     }
 
     public static string ConvertHex(string str)
