@@ -5,7 +5,8 @@ using System.Text;
 using System.Collections.Generic;
 using MessageMaker;
 
-namespace MessageMaker {
+namespace MessageMaker
+{
     public class Message
     {
         public string type;
@@ -18,7 +19,7 @@ namespace MessageMaker {
 
         byte callEnd;
         byte payloadEnd;
-        
+
         public Message(string type, string callsign, string payload)
         {
             this.type = type;
@@ -62,7 +63,7 @@ namespace MessageMaker {
         public byte[] toBytes()
         {
             List<byte> byteArray = new List<byte>();
-            
+
             // add header
             byteArray.Add(0xFF);
             byteArray.Add(0x99);
@@ -74,17 +75,17 @@ namespace MessageMaker {
             byteArray.Add(0x00);
 
             // add callsign
-            foreach(byte byteInString in convertToUTF8(callsign))
+            foreach (byte byteInString in convertToUTF8(callsign))
             {
                 byteArray.Add(byteInString);
             }
             byteArray.Add(callEnd);
 
             // check if payload isnt null and type isnt init
-            if(payload != "" && type != "init")
+            if (payload != "" && type != "init")
             {
                 // add payload
-                foreach(byte byteInString in convertToUTF8(payload))
+                foreach (byte byteInString in convertToUTF8(payload))
                 {
                     byteArray.Add(byteInString);
                 }

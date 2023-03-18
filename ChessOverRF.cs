@@ -15,70 +15,110 @@ public static class ChessOverRF
 
     static string? messages;
 
+    static Message? currentMsg;
+
     static Regex? hexRx;
     static Regex? msgSearcher;
 
+    static bool transmitting;
+
+    static bool newMessage;
+
     public static void Main(string[] args)
     {
-        
-        IFldigiRPC proxy = (IFldigiRPC)XmlRpcProxyGen.Create(typeof(IFldigiRPC));        
+        IFldigiRPC proxy = (IFldigiRPC)XmlRpcProxyGen.Create(typeof(IFldigiRPC));
+        //proxy.ClearRX();
 
         Console.Write("Enter your callsign: ");
         string? callsign = Console.ReadLine().ToUpper();
 
         Console.Write("Are you the host of the game? (y/n): ");
-        string host = Console.ReadLine();
+        string host = Console.ReadLine().ToLower();
 
         pos = 0;
         messages = "";
         hexRx = new Regex(@"/[a-f0-9]/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         msgSearcher = new Regex(@"/(ff99fa)([a-f0-9][a-f0-9])+(fa99ff)/g", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        if(host.ToLower() == "y")
+        if (host == "y")
         {
             Console.WriteLine("Starting new game...\nTxing init message.");
             byte[] message = new Message("init", callsign, "").toBytes();
-            Console.WriteLine(string.Join(", ", message));
-            Message msg = new Message("", "", "").fromBytes(message);
-            Console.WriteLine("Callsign: " + msg.callsign + ", Type: " + msg.type + ", Payload: " + msg.payload);
+            //Console.WriteLine(string.Join(", ", message));
+            //Message msg = new Message("", "", "").fromBytes(message);
+            //Console.WriteLine("Callsign: " + msg.callsign + ", Type: " + msg.type + ", Payload: " + msg.payload);
             SendMessage(Convert.ToHexString(message), proxy);
         }
         else
         {
+            Console.Write("Press enter when you are ready to start rxing.");
+            Console.ReadLine();
             // start recieve loop
+            while(true)
+            {
+                RunLoops(proxy);
+                if(newMessage)
+                {
+                    //if(currentMsg.callsign == callsign) return;
+
+                    if(currentMsg.type == "init")
+                    {
+                        Console.WriteLine("New game from " + currentMsg.callsign + "!");
+                    }
+                }
+            }
         }
-
-        
-
     }
 
-    public static void AddToRxBufferLoop(IFldigiRPC proxy)
+    public static void RunLoops(IFldigiRPC proxy)
     {
+        //CheckRXState(proxy);
+        MessageSearcher(proxy);
+    }
+
+    public static string AddToRxBufferLoop(IFldigiRPC proxy)
+    {
+        string msgList = "";
         int newPos = proxy.GetRXLength() - pos;
-        messages += proxy.GetRXWidget(pos, newPos);
-        messages = ConvertHex(messages);
-        pos = newPos + pos;
+        msgList += proxy.GetRXWidget(pos, newPos).ToString();
+        msgList = ConvertHex(msgList);
+        
+        pos += newPos;
+        return msgList;
     }
 
-    public static void MessageSearcher(string messages)
+    public static void MessageSearcher(IFldigiRPC proxy)
     {
-        MatchCollection matches = msgSearcher.Matches(messages);
-        string packets = "";
+        Thread.Sleep(100);
+        int curPos = proxy.GetRXLength();
+        Thread.Sleep(100);
+        string msgList = Encoding.UTF8.GetString(proxy.GetRXWidget(0, curPos));
+        Console.WriteLine(msgList);
+        MatchCollection matches = msgSearcher.Matches(msgList);
 
-        foreach(Match match in matches)
-        {
-            packets += match.Value;
-        }
-        messages = messages.Substring(1);
+        if(matches.Count == 0) return;
+        Console.WriteLine(matches[0].Value);
+        
+        Message message = new Message("", "", "");
+        message.fromBytes(StringToByteArray(matches[0].Value));
+        currentMsg = message;
+        newMessage = true;
+        proxy.ClearRX();
+        
     }
 
-    public static string ConvertHex(string str)
+    public static void CheckRXState(IFldigiRPC proxy)
+    {
+        if (proxy.GetTRState() == "RX") transmitting = false;
+    }
+
+    public static string ConvertHex(string? str)
     {
         string returnStr = "";
 
-        foreach(char c in str)
+        foreach (char c in str)
         {
-            if(!hexRx.IsMatch(c.ToString()))
+            if (!hexRx.IsMatch(c.ToString()))
             {
                 returnStr += "0";
             }
@@ -95,13 +135,20 @@ public static class ChessOverRF
     {
         proxy.AddText(message + "^r");
 
-        if(proxy.GetTRState() == "RX")
+        if (proxy.GetTRState() == "RX")
         {
             proxy.StartTx();
-        } else
+        }
+        else
         {
             throw new Exception("Already transmitting.");
         }
     }
 
+    public static byte[] StringToByteArray(string hex) {
+        return Enumerable.Range(0, hex.Length)
+                        .Where(x => x % 2 == 0)
+                        .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                        .ToArray();
+    }
 }

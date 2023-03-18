@@ -16,9 +16,12 @@ namespace XMLRPC
         String GetTRState();
 
         [XmlRpcMethod("text.get_rx")]
-        String GetRXWidget(int start, int end);
+        byte[] GetRXWidget(int start, int end);
 
         [XmlRpcMethod("text.get_rx_length")]
         int GetRXLength();
+
+        [XmlRpcMethod("text.clear_rx")]
+        String ClearRX();
     }
 }
