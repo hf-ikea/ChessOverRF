@@ -1,3 +1,5 @@
+#pragma warning disable CS8604
+
 using System;
 using System.Text;
 using System.Collections.Generic;
