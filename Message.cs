@@ -30,11 +30,13 @@ namespace MessageMaker
             typeDict.Add("init", 0x11);
             typeDict.Add("join", 0x22);
             typeDict.Add("turn", 0x33);
+            typeDict.Add("win", 0x44);
 
             lookUp = new Dictionary<byte, string>();
             lookUp.Add(0x11, "init");
             lookUp.Add(0x22, "join");
             lookUp.Add(0x33, "turn");
+            lookUp.Add(0x44, "win");
 
             callEnd = 0xAF;
             payloadEnd = 0xAE;
@@ -53,7 +55,7 @@ namespace MessageMaker
             this.type = lookUp[decodedBytes[4]];
             this.callsign = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, 6, callEndByte - 6).ToArray());
             // decode payload if it exists
-            if (this.type == "init" || this.type == "join" || this.type == "ack") this.payload = null;
+            if (this.type == "init" || this.type == "join" || this.type == "win") this.payload = null;
             else
             {
                 this.payload = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, callEndByte + 1, Array.IndexOf(decodedBytes, payloadEnd) - callEndByte - 1).ToArray());
