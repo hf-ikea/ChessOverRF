@@ -1,7 +1,6 @@
 #pragma warning disable CS8602
 #pragma warning disable CS8600
 
-using System;
 using Chess.Core;
 using CookComputing.XmlRpc;
 using XMLRPC;
@@ -67,8 +66,10 @@ public static class ChessOverRF
 
                     if(currentMsg.type == "join")
                     {
-                        opponent = new Player(currentMsg.callsign);
-                        opponent.opponentTurn = false;
+                        opponent = new Player(currentMsg.callsign)
+                        {
+                            opponentTurn = false
+                        };
                         Console.WriteLine(opponent.callsign + " has joined your game.");
                         gameStarted = true;
                         
@@ -95,7 +96,7 @@ public static class ChessOverRF
                     }
                     else if(currentMsg.type == "win" && gameStarted && currentMsg.callsign == opponent.callsign)
                     {
-                        Console.WriteLine("You loose...");
+                        Console.WriteLine("You lose...");
                         break;
                     }
                 }
@@ -148,6 +149,10 @@ public static class ChessOverRF
     public static void TakeTurn(IFldigiRPC proxy, string callsign)
     {
         opponent.opponentTurn = false;
+        if(currentMsg.payload == null)
+        {
+            return;
+        }
         Console.WriteLine(currentMsg.payload);
         ChessMovement opponentMove = JsonSerializer.Deserialize<ChessMovement>(currentMsg.payload);
 
@@ -200,12 +205,14 @@ public static class ChessOverRF
         char toColumn = source.ToUpper()[0];  
         int toRow = Convert.ToInt32(source.Substring(1,1));
 
-        ChessMovement returnVal = new ChessMovement();
-        returnVal.rs = game.Move(fromColumn, fromRow, toColumn, toRow);
-        returnVal.fc = fromColumn;
-        returnVal.fr = fromRow;
-        returnVal.tc = toColumn;
-        returnVal.tr = toRow;
+        ChessMovement returnVal = new ChessMovement
+        {
+            rs = game.Move(fromColumn, fromRow, toColumn, toRow),
+            fc = fromColumn,
+            fr = fromRow,
+            tc = toColumn,
+            tr = toRow
+        };
 
         return returnVal;
     }

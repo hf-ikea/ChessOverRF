@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chess.Core.Model
+﻿namespace Chess.Core.Model
 {
     public struct Movement
     {

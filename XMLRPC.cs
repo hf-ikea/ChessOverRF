@@ -1,6 +1,5 @@
 using CookComputing.XmlRpc;
 
-
 namespace XMLRPC
 {
     [XmlRpcUrl("http://127.0.0.1:7362")]

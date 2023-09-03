@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Chess.Core.Model
 {
@@ -9,7 +7,7 @@ namespace Chess.Core.Model
         public abstract string Letter { get; }
         public char Color { get; private set; }
 
-        public Boolean IsAlive { get; set; }
+        public bool IsAlive { get; set; }
 
         protected Collection<Rule> Rules;
 
@@ -17,7 +15,7 @@ namespace Chess.Core.Model
         {
             Rules = new Collection<Rule>();
 
-            Color = (color == PieceColor.White ? 'W' : 'B');
+            Color = color == PieceColor.White ? 'W' : 'B';
 
             IsAlive = true;
 

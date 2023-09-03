@@ -1,7 +1,5 @@
 ﻿#pragma warning disable CS8602
 
-using System;
-
 using Chess.Core;
 
 namespace Chess.Player
@@ -12,15 +10,15 @@ namespace Chess.Player
         {
             Console.WriteLine("Chess player started.");
 
-            var game = new ChessGame();
+            ChessGame game = new ChessGame();
 
-            var finished = false;
+            bool finished = false;
 
             while (!finished)
             {
                 Console.WriteLine("Make your choice (h -> help) ?");
 
-                var command = Console.ReadLine();
+                string? command = Console.ReadLine();
 
                 switch (command)
                 {
@@ -75,6 +73,5 @@ namespace Chess.Player
 
             Console.WriteLine("End of program.");
         }
-
     }
 }

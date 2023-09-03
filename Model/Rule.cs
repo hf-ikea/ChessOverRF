@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Chess.Core.Model
+﻿namespace Chess.Core.Model
 {
     public class Rule
     {

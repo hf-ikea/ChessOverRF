@@ -1,9 +1,6 @@
 #pragma warning disable CS8604
 
-using System;
 using System.Text;
-using System.Collections.Generic;
-using MessageMaker;
 
 namespace MessageMaker
 {
@@ -26,17 +23,21 @@ namespace MessageMaker
             this.callsign = callsign;
             this.payload = payload;
 
-            typeDict = new Dictionary<string, byte>();
-            typeDict.Add("init", 0x11);
-            typeDict.Add("join", 0x22);
-            typeDict.Add("turn", 0x33);
-            typeDict.Add("win", 0x44);
+            typeDict = new Dictionary<string, byte>
+            {
+                { "init", 0x11 },
+                { "join", 0x22 },
+                { "turn", 0x33 },
+                { "win", 0x44 }
+            };
 
-            lookUp = new Dictionary<byte, string>();
-            lookUp.Add(0x11, "init");
-            lookUp.Add(0x22, "join");
-            lookUp.Add(0x33, "turn");
-            lookUp.Add(0x44, "win");
+            lookUp = new Dictionary<byte, string>
+            {
+                { 0x11, "init" },
+                { 0x22, "join" },
+                { 0x33, "turn" },
+                { 0x44, "win" }
+            };
 
             callEnd = 0xAF;
             payloadEnd = 0xAE;
@@ -52,8 +53,8 @@ namespace MessageMaker
             byte[] decodedBytes = ReedSolomon.Decode(bytes.ToList<byte>());
             int callEndByte = Array.IndexOf(decodedBytes, callEnd);
 
-            this.type = lookUp[decodedBytes[4]];
-            this.callsign = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, 6, callEndByte - 6).ToArray());
+            type = lookUp[decodedBytes[4]];
+            callsign = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, 6, callEndByte - 6).ToArray());
             // decode payload if it exists
             if (this.type == "init" || this.type == "join" || this.type == "win") this.payload = null;
             else
@@ -66,17 +67,18 @@ namespace MessageMaker
 
         public byte[] toBytes()
         {
-            List<byte> byteArray = new List<byte>();
+            List<byte> byteArray = new List<byte>
+            {
+                // add header
+                0xFF,
+                0x99,
+                0xFA,
+                0x00,
 
-            // add header
-            byteArray.Add(0xFF);
-            byteArray.Add(0x99);
-            byteArray.Add(0xFA);
-            byteArray.Add(0x00);
-
-            // add type
-            byteArray.Add(typeDict[type]);
-            byteArray.Add(0x00);
+                // add type
+                typeDict[type],
+                0x00
+            };
 
             // add callsign
             foreach (byte byteInString in convertToUTF8(callsign))

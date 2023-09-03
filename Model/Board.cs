@@ -3,9 +3,6 @@
 #pragma warning disable CS8604
 #pragma warning disable CS8625
 
-using System;
-using System.Collections.Generic;
-
 namespace Chess.Core.Model
 {
     public class Board
@@ -17,7 +14,7 @@ namespace Chess.Core.Model
         };
 
         // piece's position status on board
-        private Object[,] _cases;
+        private object[,] _cases;
         private IList<Piece> _pieces;
 
         public object[,] Cases() => _cases;
@@ -30,7 +27,7 @@ namespace Chess.Core.Model
 
         public static Board NewGame()
         {
-            var board = new Board();
+            Board board = new Board();
 
             board.InitGame();
 
@@ -94,7 +91,7 @@ namespace Chess.Core.Model
         // try to do a movement of piece
         public MovementResult MovePiece(char column, int row, char targetColumn, int targetRow, PieceColor? color = null)
         {
-            var result = new MovementResult();
+            MovementResult result = new MovementResult();
 
             if (Columns[targetColumn] < 1 || Columns[targetColumn] > 8 || targetRow < 1 || targetRow > 8)
             {
@@ -112,7 +109,7 @@ namespace Chess.Core.Model
                 return result;
             }
 
-            var selectPiece = GetPiece(column, row);
+            Piece? selectPiece = GetPiece(column, row);
 
             // check if there is a piece at start position
             if (selectPiece == null)
@@ -136,7 +133,7 @@ namespace Chess.Core.Model
                 }
             }
 
-            var targetPiece = GetPiece(targetColumn, targetRow);
+            Piece? targetPiece = GetPiece(targetColumn, targetRow);
 
             // check it is a valid movement for piece (rules piece validator)
             if (!selectPiece.IsValidMovement(
@@ -221,7 +218,7 @@ namespace Chess.Core.Model
 
             while (!(c == (Columns[targetColumn] - 1) && r == (targetRow - 1)))
             {
-                var p = _cases[r, c];
+                object p = _cases[r, c];
 
                 if (p != null)
                 {
@@ -236,6 +233,5 @@ namespace Chess.Core.Model
 
             return result;
         }
-
     }
 }

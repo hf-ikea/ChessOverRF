@@ -1,9 +1,7 @@
-using System;
 using STH1123.ReedSolomon;
 
 namespace MessageMaker
 {
-
     public class ReedSolomon
     {
         public static byte[] Encode(List<byte> byteArray)
@@ -38,9 +36,6 @@ namespace MessageMaker
             {
                 throw new Exception("Too many errors/erasures to correct");
             }
-
-
         }
     }
-
 }

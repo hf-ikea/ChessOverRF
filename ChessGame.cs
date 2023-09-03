@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Chess.Core.Model;
 
 namespace Chess.Core
@@ -23,7 +21,7 @@ namespace Chess.Core
 
             if (result.IsSuccess)
             {
-                _nextPlayerColor = (_nextPlayerColor == PieceColor.White ? PieceColor.Black : PieceColor.White);
+                _nextPlayerColor = _nextPlayerColor == PieceColor.White ? PieceColor.Black : PieceColor.White;
             }
 
             return result;
@@ -31,14 +29,15 @@ namespace Chess.Core
 
         public string ShowNextPlayer()
         {
-            return (_nextPlayerColor == PieceColor.White ? "WHITE" : "BLACK");
+            return _nextPlayerColor == PieceColor.White ? "WHITE" : "BLACK";
         }
 
         public void ShowBoard(Stream outStream)
         {
-            var sw = new StreamWriter(outStream);
-            sw.AutoFlush = true;
-            // Console.SetOut(sw);
+            var sw = new StreamWriter(outStream)
+            {
+                AutoFlush = true
+            };
 
             sw.WriteLine("\n   -------------------------------------------------");
 
@@ -48,9 +47,7 @@ namespace Chess.Core
 
                 for (int j = 1; j <= 8; j++)
                 {
-                    var position = ChessBoard.Cases()[i - 1, j - 1] as Piece;
-
-                    if (position != null) sw.Write(position.ToString());
+                    if (ChessBoard.Cases()[i - 1, j - 1] is Piece position) sw.Write(position.ToString());
                     else sw.Write("   ");
 
                     sw.Write(" | ");
