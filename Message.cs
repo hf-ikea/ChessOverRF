@@ -10,12 +10,12 @@ namespace MessageMaker
         public string callsign;
         public string? payload;
 
-        Dictionary<string, byte> typeDict;
+        readonly Dictionary<string, byte> typeDict;
 
-        Dictionary<byte, string> lookUp;
+        readonly Dictionary<byte, string> lookUp;
 
-        byte callEnd;
-        byte payloadEnd;
+        readonly byte callEnd;
+        readonly byte payloadEnd;
 
         public Message(string type, string callsign, string payload)
         {
@@ -56,10 +56,10 @@ namespace MessageMaker
             type = lookUp[decodedBytes[4]];
             callsign = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, 6, callEndByte - 6).ToArray());
             // decode payload if it exists
-            if (this.type == "init" || this.type == "join" || this.type == "win") this.payload = null;
+            if (type == "init" || type == "join" || type == "win") payload = null;
             else
             {
-                this.payload = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, callEndByte + 1, Array.IndexOf(decodedBytes, payloadEnd) - callEndByte - 1).ToArray());
+                payload = Encoding.UTF8.GetString(new ArraySegment<byte>(decodedBytes, callEndByte + 1, Array.IndexOf(decodedBytes, payloadEnd) - callEndByte - 1).ToArray());
             }
 
             return this;

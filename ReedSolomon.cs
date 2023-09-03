@@ -6,8 +6,8 @@ namespace MessageMaker
     {
         public static byte[] Encode(List<byte> byteArray)
         {
-            GenericGF field = new GenericGF(285, 256, 0);
-            ReedSolomonEncoder rse = new ReedSolomonEncoder(field);
+            GenericGF field = new(285, 256, 0);
+            ReedSolomonEncoder rse = new(field);
 
             for (int i = 0; i < 9; i++)
             {
@@ -23,8 +23,8 @@ namespace MessageMaker
 
         public static byte[] Decode(List<byte> byteArray)
         {
-            GenericGF field = new GenericGF(285, 256, 0);
-            ReedSolomonDecoder rsd = new ReedSolomonDecoder(field);
+            GenericGF field = new(285, 256, 0);
+            ReedSolomonDecoder rsd = new(field);
 
             int[] dataToDecode = byteArray.Select(x => (int)x).ToArray();
 

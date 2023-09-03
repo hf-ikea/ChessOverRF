@@ -157,7 +157,7 @@ public static class ChessOverRF
         ChessMovement opponentMove = JsonSerializer.Deserialize<ChessMovement>(currentMsg.payload);
 
         game = new ChessGame();
-        game.Move(opponentMove.fc, opponentMove.fr, opponentMove.tc, opponentMove.tr);
+        game.Move(opponentMove.Fc, opponentMove.Fr, opponentMove.Tc, opponentMove.Tr);
         game.ShowBoard(Console.OpenStandardOutput());
 
         ChessMovement moveStruct = MakeMove(game);
@@ -205,13 +205,13 @@ public static class ChessOverRF
         char toColumn = source.ToUpper()[0];  
         int toRow = Convert.ToInt32(source.Substring(1,1));
 
-        ChessMovement returnVal = new ChessMovement
+        ChessMovement returnVal = new()
         {
             rs = game.Move(fromColumn, fromRow, toColumn, toRow),
-            fc = fromColumn,
-            fr = fromRow,
-            tc = toColumn,
-            tr = toRow
+            Fc = fromColumn,
+            Fr = fromRow,
+            Tc = toColumn,
+            Tr = toRow
         };
 
         return returnVal;
@@ -235,7 +235,7 @@ public static class ChessOverRF
 
         if(matches.Count == 0) return;
         
-        Message message = new Message("", "", "");
+        Message message = new("", "", "");
         message.fromBytes(StringToByteArray(matches[0].Value));
         currentMsg = message;
         newMessage = true;
@@ -293,9 +293,9 @@ public static class ChessOverRF
     public struct ChessMovement
     {
         public MovementResult rs;
-        public char fc { get; set; }
-        public int fr { get; set; }
-        public char tc { get; set; }
-        public int tr { get; set; }
+        public char Fc { get; set; }
+        public int Fr { get; set; }
+        public char Tc { get; set; }
+        public int Tr { get; set; }
     }
 }

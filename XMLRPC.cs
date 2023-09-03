@@ -6,13 +6,13 @@ namespace XMLRPC
     public interface IFldigiRPC : IXmlRpcProxy
     {
         [XmlRpcMethod("text.add_tx")]
-        String AddText(string message);
+        string AddText(string message);
 
         [XmlRpcMethod("main.tx")]
-        String StartTx();
+        string StartTx();
 
         [XmlRpcMethod("main.get_trx_state")]
-        String GetTRState();
+        string GetTRState();
 
         [XmlRpcMethod("text.get_rx")]
         byte[] GetRXWidget(int start, int end);
@@ -21,6 +21,6 @@ namespace XMLRPC
         int GetRXLength();
 
         [XmlRpcMethod("text.clear_rx")]
-        String ClearRX();
+        string ClearRX();
     }
 }
